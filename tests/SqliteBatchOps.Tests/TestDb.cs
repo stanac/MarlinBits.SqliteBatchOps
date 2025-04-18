@@ -8,7 +8,7 @@ public class TestDb : IDisposable
     private readonly string _dbTestRootDirPath;
     public string DbConnectionString { get; }
 
-    public TestDb(string? createTableSql = null)
+    public TestDb(string? createTableSql = null, bool useWal = false)
     {
         _dbTestRootDirPath = Environment.GetEnvironmentVariable("DbTestDir")
                              ?? Directory.CreateTempSubdirectory("testDbDir").FullName;
@@ -22,6 +22,11 @@ public class TestDb : IDisposable
 
         DbConnectionString = $"Data Source={Path.Combine(_dbTestRootDirPath, "test-db.sqlite")}";
 
+        if (useWal)
+        {
+            Execute("PRAGMA journal_mode = WAL");
+        }
+        
         if (createTableSql != null)
         {
             Execute(createTableSql);
