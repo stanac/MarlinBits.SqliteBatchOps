@@ -22,7 +22,9 @@ public class BatchCommand
     public required string CommandText { get; init; }
     public required object? Param { get; init; }
     public required bool GetChanges { get; init; }
+    internal long? Result { get; set; }
     internal TaskCompletionSource<long?> CompletionSource { get; } = new();
+    internal void SetResult() => CompletionSource.SetResult(Result);
 }
 
 //public class BatchCommand<T>(string CommandText, object? Param = null) : BatchCommand

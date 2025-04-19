@@ -69,7 +69,7 @@ internal class CommandQueue : IDisposable
     {
         lock (_lock)
         {
-      //      Console.WriteLine("Process ALL entered lock");
+            BatchCommand? commandWithError = null;
 
             if (_commands.Count == 0)
             {
@@ -77,17 +77,40 @@ internal class CommandQueue : IDisposable
                 return;
             }
 
-      //      Console.WriteLine($"Process ALL processing: {_commands.Count}");
-
             SqliteTransaction transaction = _connection.BeginTransaction();
 
             foreach (BatchCommand cmd in _commands)
             {
-                Execute(cmd, transaction);
+                try
+                {
+                    Execute(cmd, transaction);
+                }
+                catch (Exception e)
+                {
+                    commandWithError = cmd;
+                    cmd.CompletionSource.SetException(e);
+                    break;
+                }
+            }
+
+            if (commandWithError is not null)
+            {
+                foreach (BatchCommand cmd in _commands)
+                {
+                    if (cmd != commandWithError)
+                    {
+                        cmd.CompletionSource.SetCanceled();
+                    }
+                }
             }
 
             transaction.Commit();
-       //     Console.WriteLine($"Process Processed: {_commands.Count}");
+
+            foreach (BatchCommand cmd in _commands)
+            {
+                cmd.SetResult();
+            }
+       
             _commands.Clear();
         }
     }
@@ -103,7 +126,7 @@ internal class CommandQueue : IDisposable
             changes = _connection.QuerySingle<long>("SELECT CHANGES()");
         }
 
-        command.CompletionSource.SetResult(changes);
+        command.Result = changes;
     }
 
     public void Dispose()
