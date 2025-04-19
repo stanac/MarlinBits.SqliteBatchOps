@@ -65,11 +65,18 @@ internal class CommandQueue : IDisposable
         }
     }
 
-    public void ProcessAll()
+    public void ProcessAll() => ProcessAll(0);
+
+    private void ProcessAll(int attempt)
     {
+        if (attempt > 5)
+        {
+            return;
+        }
+
         lock (_lock)
         {
-            BatchCommand? commandWithError = null;
+            bool errorFound = false;
 
             if (_commands.Count == 0)
             {
@@ -87,20 +94,23 @@ internal class CommandQueue : IDisposable
                 }
                 catch (Exception e)
                 {
-                    commandWithError = cmd;
+                    errorFound = true;
+                    cmd.Error = e;
                     cmd.CompletionSource.SetException(e);
+                    transaction.Rollback();
                     break;
                 }
             }
 
-            if (commandWithError is not null)
+            if (errorFound)
             {
-                foreach (BatchCommand cmd in _commands)
+                List<BatchCommand> toExecute = _commands.Where(x => x.Error is null).ToList();
+
+                transaction = _connection.BeginTransaction();
+
+                foreach (BatchCommand cmd in toExecute)
                 {
-                    if (cmd != commandWithError)
-                    {
-                        cmd.CompletionSource.SetCanceled();
-                    }
+                    Execute(cmd, transaction);
                 }
             }
 
@@ -108,9 +118,9 @@ internal class CommandQueue : IDisposable
 
             foreach (BatchCommand cmd in _commands)
             {
-                cmd.SetResult();
+                cmd.Complete();
             }
-       
+
             _commands.Clear();
         }
     }

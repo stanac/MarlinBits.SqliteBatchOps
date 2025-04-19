@@ -64,7 +64,6 @@ public class BatchOpsTests : IDisposable
     [Fact]
     public async Task MultipleInserts_OneInvalidSql_Throws()
     {
-
         using BatchOpsFactory factory = new();
         BatchOps batchOps = factory.GetBatchOps(_testDb.DbConnectionString);
         int count = 10;

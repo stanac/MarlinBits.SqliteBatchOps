@@ -24,7 +24,19 @@ public class BatchCommand
     public required bool GetChanges { get; init; }
     internal long? Result { get; set; }
     internal TaskCompletionSource<long?> CompletionSource { get; } = new();
-    internal void SetResult() => CompletionSource.SetResult(Result);
+    internal Exception? Error { get; set; }
+
+    internal void Complete()
+    {
+        if (Error is not null)
+        {
+            CompletionSource.SetException(Error);
+        }
+        else
+        {
+            CompletionSource.SetResult(Result);
+        }
+    }
 }
 
 //public class BatchCommand<T>(string CommandText, object? Param = null) : BatchCommand
