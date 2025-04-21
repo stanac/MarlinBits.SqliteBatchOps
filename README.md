@@ -1,6 +1,8 @@
 # SqliteBatchOps
 
-Fast batch insert/update/delete for SQLite with Dapper.
+Fast batch insert/update/delete for `Microsoft.Data.Sqlite`.
+
+This library can execute 30x more commands (inserts/deletes/updates) per second compared to execution of individual commands. But it has ~55ms overhead for individual commands.
 
 ## What?
 
@@ -22,17 +24,14 @@ to speed up inserts, updates and deletes.
 Reference nuget package:
 
 ```
-dotnet add package Dapper SqliteBatchOps
+dotnet add package SqliteBatchOps
 ```
 
 ```
 // other usings
 using SqliteBatchOps;
 
-
-using var connection = new SqliteConnection("Data Source=db.sqlite");
-
-connection.
+// TODO
 
 ```
 
@@ -144,5 +143,5 @@ low number of concurrent commands.
 In other words, don't use it for single client applications (like mobile or desktop applications).
 Also this library is not suitable for internal web applications with low number of user, or low number of writes.
 
-If you are developing web application (SSR/API) with burst write loads (where you expect more than 200 writes per second)
+If you are developing web application (SSR/API) with burst write loads (where you expect more than 50 writes per second)
 I would recommend to use the library, and only in WAL mode.
