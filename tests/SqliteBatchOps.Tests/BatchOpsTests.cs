@@ -26,17 +26,20 @@ public class BatchOpsTests : IDisposable
     [Fact]
     public async Task SingleInsertWithWal_GetCount_Returns1()
     {
-        TestDb testDb = new(CreateTableSql, true);
-        using BatchOpsFactory factory = new();
-        BatchOps batchOps = factory.GetBatchOps(testDb.DbConnectionString);
+        for (int i = 0; i < 100; i++) // test was flaky, try multiple times just in case
+        {
+            TestDb testDb = new(CreateTableSql, true);
+            using BatchOpsFactory factory = new();
+            BatchOps batchOps = factory.GetBatchOps(testDb.DbConnectionString);
 
-        await batchOps.ExecuteAsync("INSERT INTO T1 (Val1, Val2) VALUES (1, '1')");
+            await batchOps.ExecuteAsync("INSERT INTO T1 (Val1, Val2) VALUES (1, '1')");
 
-        // await Task.Delay(1200);
+            // await Task.Delay(1200);
 
-        int count = testDb.QueryFirstOrDefault<int>("SELECT COUNT(1) FROM T1");
+            int count = testDb.QueryFirstOrDefault<int>("SELECT COUNT(1) FROM T1");
 
-        count.Should().Be(1);
+            count.Should().Be(1);
+        }
     }
 
     [Fact]
@@ -79,14 +82,12 @@ public class BatchOpsTests : IDisposable
                         v2 = value.ToString()
                     });
                 }
-                else
+
+                return batchOps.ExecuteAsync("INSERT INTO T1 (Val1, Val2) VALUES (@v1, @v2)", new
                 {
-                    return batchOps.ExecuteAsync("INSERT INTO T1 (Val1, Val2) VALUES (@v1, @v2)", new
-                    {
-                        v1 = value,
-                        v2 = value.ToString()
-                    });
-                }
+                    v1 = value,
+                    v2 = value.ToString()
+                });
             });
 
         Func<Task> allTasks = () => Task.WhenAll(tasks);

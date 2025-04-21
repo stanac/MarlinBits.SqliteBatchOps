@@ -13,7 +13,7 @@ public class TestDb : IDisposable
         _dbTestRootDirPath = Environment.GetEnvironmentVariable("DbTestDir")
                              ?? Directory.CreateTempSubdirectory("testDbDir").FullName;
 
-        _dbTestRootDirPath = Path.Combine(_dbTestRootDirPath, $"TestDb-{DateTimeOffset.UtcNow:yyyy-MM-dd-HH-mm-ss}");
+        _dbTestRootDirPath = Path.Combine(_dbTestRootDirPath, $"TestDb-{DateTimeOffset.UtcNow:yyyy-MM-dd-HH-mm-ss}-{Guid.NewGuid():N}");
         
         if (!Directory.Exists(_dbTestRootDirPath))
         {

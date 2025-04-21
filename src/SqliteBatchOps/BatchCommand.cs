@@ -25,9 +25,17 @@ public class BatchCommand
     internal long? Result { get; set; }
     internal TaskCompletionSource<long?> CompletionSource { get; } = new();
     internal Exception? Error { get; set; }
+    internal bool IsCompleted { get; private set; }
 
     internal void Complete()
     {
+        if (IsCompleted)
+        {
+            return;
+        }
+
+        IsCompleted = true;
+
         if (Error is not null)
         {
             CompletionSource.SetException(Error);

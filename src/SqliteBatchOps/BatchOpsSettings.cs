@@ -6,7 +6,7 @@
 public class BatchOpsSettings
 {
     private int _millisecondsWait = 50;
-    private int _maxBatchSize = 1000;
+    private int _maxBatchSize = 5000;
 
     /// <summary>
     /// How long to wait before triggering batch in milliseconds, default is 500.

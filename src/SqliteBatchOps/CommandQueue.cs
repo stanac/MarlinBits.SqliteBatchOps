@@ -65,68 +65,69 @@ internal class CommandQueue : IDisposable
         }
     }
 
-    public void ProcessAll() => ProcessAll(0);
+    public void ProcessAll()
+    {
+        lock (_lock)
+        {
+            if (_commands.Count == 0)
+            {
+                return;
+            }
+
+            ProcessAll(0);
+            _commands.RemoveAll(x => x.IsCompleted);
+        }
+    }
 
     private void ProcessAll(int attempt)
     {
-        if (attempt > 5)
+        if (attempt > 100)
         {
             return;
         }
 
-        lock (_lock)
+        if (_commands.Count == 0)
         {
-            bool errorFound = false;
+            return;
+        }
 
-            if (_commands.Count == 0)
+        SqliteTransaction transaction = _connection.BeginTransaction();
+
+        foreach (BatchCommand cmd in _commands)
+        {
+            try
             {
-                // Console.WriteLine("Process ALL nothing to process");
+                Execute(cmd, transaction);
+            }
+            catch (Exception e)
+            {
+                cmd.Error = e;
+                cmd.CompletionSource.SetException(e);
+                cmd.Complete();
+                transaction.Rollback();
+                transaction.Dispose();
+                ProcessAll(attempt + 1);
                 return;
             }
-
-            SqliteTransaction transaction = _connection.BeginTransaction();
-
-            foreach (BatchCommand cmd in _commands)
-            {
-                try
-                {
-                    Execute(cmd, transaction);
-                }
-                catch (Exception e)
-                {
-                    errorFound = true;
-                    cmd.Error = e;
-                    cmd.CompletionSource.SetException(e);
-                    transaction.Rollback();
-                    break;
-                }
-            }
-
-            if (errorFound)
-            {
-                List<BatchCommand> toExecute = _commands.Where(x => x.Error is null).ToList();
-
-                transaction = _connection.BeginTransaction();
-
-                foreach (BatchCommand cmd in toExecute)
-                {
-                    Execute(cmd, transaction);
-                }
-            }
-
-            transaction.Commit();
-
-            foreach (BatchCommand cmd in _commands)
-            {
-                cmd.Complete();
-            }
-
-            _commands.Clear();
         }
+        
+        transaction.Commit();
+
+        foreach (BatchCommand cmd in _commands)
+        {
+            cmd.Complete();
+        }
+
+        transaction.Dispose();
     }
 
     private void Execute(BatchCommand command, SqliteTransaction transaction)
     {
+        if (command.IsCompleted)
+        {
+            return;
+        }
+
         _connection.Execute(command.CommandText, command.Param, transaction);
 
         long? changes = null;
