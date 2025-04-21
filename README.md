@@ -9,7 +9,7 @@ SqliteBatchOps is adding extension method to IDbConnection and is using [Dapper]
 ## Why?
 
 SQLite is very slow with opening and closing transactions. 
-You can perform 200 inserts without transaction or 50000 with a single transaction.
+You can perform 200 inserts per second without transaction or 50000 per second with a single transaction.
 
 If you don't specify a transaction SQLite will use new transaction for each SQL write statement (including deletes and updates). 
 Since SQLite can have only one writer, this becomes a bottleneck.
@@ -51,6 +51,8 @@ For those types of application use transactions when inserting/deleting/updating
 
 It is highly recommended to use it in WAL mode (see `BatchOpsSettings`).
 
+Only `async` operations are supported.
+`Task`s are used as callback functions and there is not way to achieve the same with sync operation.
 
 ## Benchmarks using NVMe drive and WAL mode
 
@@ -93,11 +95,11 @@ Performance gains:
 | 500     |  947 ms       | 59 ms      |     16x          |
 | 1000    | 1913 ms       | 59 ms      |     32x          |
 
-Batch operations take consistantly around 60ms, better results may be achived with different BatchOpsSettings (MillisecondsWait property, default value is 50).
+Batch operations take consistently around 60ms, better results may be achieved with different `BatchOpsSettings` (`MillisecondsWait` property, default value is 50).
 
 Below are results of batch inserts only, because running more than 1000 discrete inserts is very slow even in WAL mode.
 
-MillisecondsWait property set to 50:
+`MillisecondsWait` property set to 50:
 
 | Method          | NumberOfConcurrentInserts | Mean      | Error    | StdDev    |
 |---------------- |-------------------------- |----------:|---------:|----------:|
@@ -115,7 +117,7 @@ MillisecondsWait property set to 50:
 | InsertWithBatch | 50,000                    | 170.42 ms | 3.340 ms |  6.354 ms |
 | InsertWithBatch | 100,000                   | 317.20 ms | 4.165 ms |  3.692 ms |
 
-MillisecondsWait property set to 10:
+`MillisecondsWait` property set to 10:
 
 | Method          | NumberOfConcurrentInserts | Mean      | Error    | StdDev   |
 |---------------- |-------------------------- |----------:|---------:|---------:|
@@ -133,7 +135,7 @@ MillisecondsWait property set to 10:
 | InsertWithBatch | 50000                     | 163.75 ms | 3.245 ms | 4.104 ms |
 | InsertWithBatch | 100000                    | 328.61 ms | 4.892 ms | 4.085 ms |
 
-Somewhat better results are achived with lowering wait time, but not significantly.
+Somewhat better results are achieved with lowering wait time, but not significantly.
 
 ## When to use the library and when not to use it
 
