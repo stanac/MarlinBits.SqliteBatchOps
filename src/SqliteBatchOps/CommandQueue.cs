@@ -102,7 +102,6 @@ internal class CommandQueue : IDisposable
             catch (Exception e)
             {
                 cmd.Error = e;
-                cmd.CompletionSource.SetException(e);
                 cmd.Complete();
                 transaction.Rollback();
                 transaction.Dispose();

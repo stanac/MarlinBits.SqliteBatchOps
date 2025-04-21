@@ -93,6 +93,10 @@ public class BatchOpsTests : IDisposable
         Func<Task> allTasks = () => Task.WhenAll(tasks);
 
         await allTasks.Should().ThrowAsync<Exception>();
+
+        int rowsCount = _testDb.QueryFirstOrDefault<int>("SELECT COUNT(1) FROM T1");
+
+        rowsCount.Should().Be(count - 1);
     }
 
     public void Dispose()
