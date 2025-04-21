@@ -1,12 +1,17 @@
-﻿using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 
-namespace SqliteBatchOps.Benchmarks
+namespace SqliteBatchOps.Benchmarks;
+
+internal class Program
 {
-    internal class Program
+    static void Main()
     {
-        static void Main()
-        {
-            BenchmarkRunner.Run<InsertBenchmark>();
-        }
+        BenchmarkRunner.Run(typeof(Program).Assembly);
     }
 }

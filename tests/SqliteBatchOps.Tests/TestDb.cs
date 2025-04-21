@@ -5,15 +5,16 @@ namespace SqliteBatchOps.Tests;
 
 public class TestDb : IDisposable
 {
+    private readonly string _parentDbsPath;
     private readonly string _dbTestRootDirPath;
     public string DbConnectionString { get; }
 
     public TestDb(string? createTableSql = null, bool useWal = false)
     {
-        _dbTestRootDirPath = Environment.GetEnvironmentVariable("DbTestDir")
-                             ?? Directory.CreateTempSubdirectory("testDbDir").FullName;
+        _parentDbsPath = Environment.GetEnvironmentVariable("DbTestDir")
+                         ?? Directory.CreateTempSubdirectory("testDbDir").FullName;
 
-        _dbTestRootDirPath = Path.Combine(_dbTestRootDirPath, $"TestDb-{DateTimeOffset.UtcNow:yyyy-MM-dd-HH-mm-ss}-{Guid.NewGuid():N}");
+        _dbTestRootDirPath = Path.Combine(_parentDbsPath, $"TestDb-{DateTimeOffset.UtcNow:yyyy-MM-dd-HH-mm-ss}-{Guid.NewGuid():N}");
         
         if (!Directory.Exists(_dbTestRootDirPath))
         {
@@ -63,11 +64,24 @@ public class TestDb : IDisposable
 
         try
         {
-            Directory.Delete(_dbTestRootDirPath);
+            Directory.Delete(_dbTestRootDirPath, true);
         }
         catch
         {
             Console.WriteLine("Failed to delete test DB");
+        }
+
+        // try to clean up for old finished tests
+        foreach (string dir in Directory.GetDirectories(_parentDbsPath))
+        {
+            try
+            {
+                Directory.Delete(dir, true);
+            }
+            catch
+            {
+                // nop
+            }
         }
     }
 }
