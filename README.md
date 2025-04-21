@@ -6,18 +6,25 @@ This library can execute 30x more commands (inserts/deletes/updates) per second 
 
 ## What?
 
-SqliteBatchOps is adding extension method to IDbConnection and is using [Dapper](https://github.com/DapperLib/Dapper) to execute SQL statements in single transaction for faster execution.
+`SqliteBatchOps` is adding batch command executor () and is using [Dapper](https://github.com/DapperLib/Dapper) to execute SQL statements in single transaction for faster execution.
 
 ## Why?
 
 SQLite is very slow with opening and closing transactions. 
-You can perform 200 inserts per second without transaction or 50000 per second with a single transaction.
+You can perform 200 inserts per second without transaction or hundreds of thousands of inserts per second with a few transactions.
 
 If you don't specify a transaction SQLite will use new transaction for each SQL write statement (including deletes and updates). 
-Since SQLite can have only one writer, this becomes a bottleneck.
+Since SQLite can have only one writer, it is a bottleneck.
 
 This library is using Dapper to transparently execute modifying operations in batch
 to speed up inserts, updates and deletes.
+
+## How it works?
+
+For each SQLite db your application use, you can create an instance of `BatchOps`.
+It will use a thread-synced queue in the background and trigger writes every 50,000 operations (configurable) or every 50 ms (configurable), whichever comes first.
+
+Use `BatchOpsFactory` to ensure single instance of `BatchOps` per database/connection string.
 
 ## How to use it?
 
@@ -35,18 +42,11 @@ using SqliteBatchOps;
 
 ```
 
-## How it works?
-
-For each SQLite db your application use you can create an instance of `BatchOps`.
-It will use a thread-synced queue in the background and trigger writes every 50,000 operations (configurable) or every 50 ms (configurable), whichever comes first.
-
-Use `BatchOpsFactory` to ensure single instance of `BatchOps` per database/connection string.
-
 ## Pitfalls
 
 This library has an overhead of ~50 ms by default, it can be lowered to ~25 ms. 
-It is not suitable for single client applications (mobile, desktop).
-For those types of application use transactions when inserting/deleting/updating in batch.
+It isn't suitable for single client applications (mobile, desktop).
+For those types of application use regular transactions when inserting/deleting/updating in batch.
 
 It is highly recommended to use it in WAL mode (see `BatchOpsSettings`).
 
@@ -96,7 +96,7 @@ Performance gains:
 
 Batch operations take consistently around 60ms, better results may be achieved with different `BatchOpsSettings` (`MillisecondsWait` property, default value is 50).
 
-Below are results of batch inserts only, because running more than 1000 discrete inserts is very slow even in WAL mode.
+Below are results of batch inserts only, because running more than 1000 discrete inserts is very slow (even in WAL mode).
 
 `MillisecondsWait` property set to 50:
 
@@ -136,12 +136,14 @@ Below are results of batch inserts only, because running more than 1000 discrete
 
 Somewhat better results are achieved with lowering wait time, but not significantly.
 
-## When to use the library and when not to use it
+## When not to use the library
 
 Looking at the tables above it is clear that this library should not be used for databases with
 low number of concurrent commands. 
 In other words, don't use it for single client applications (like mobile or desktop applications).
 Also this library is not suitable for internal web applications with low number of user, or low number of writes.
 
-If you are developing web application (SSR/API) with burst write loads (where you expect more than 50 writes per second)
+## When to use the library
+
+If you are developing web application (SSR/API) with burst write loads (where you expect to exceed more than 50 writes per second)
 I would recommend to use the library, and only in WAL mode.
