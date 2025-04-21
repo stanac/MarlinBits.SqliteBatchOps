@@ -45,14 +45,14 @@ Use `BatchOpsFactory` to ensure single instance of `BatchOps` per database/conne
 
 ## Pitfalls
 
-This library has an overhead of ~50 ms by default, it can be lowered to ~20 ms. 
+This library has an overhead of ~50 ms by default, it can be lowered to ~25 ms. 
 It is not suitable for single client applications (mobile, desktop).
 For those types of application use transactions when inserting/deleting/updating in batch.
 
 It is highly recommended to use it in WAL mode (see `BatchOpsSettings`).
 
 Only `async` operations are supported.
-`Task`s are used as callback functions and there is not way to achieve the same with sync operation.
+`Task`s are used as callback functions and there is no way to achieve the same with sync operation.
 
 ## Benchmarks using NVMe drive and WAL mode
 
