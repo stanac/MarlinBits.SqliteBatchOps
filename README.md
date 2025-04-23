@@ -39,50 +39,69 @@ using Dapper;
 using Marlin.BatchOps;
 using Microsoft.Data.Sqlite;
 
-private const string ConnectionString = "Data Source=my-db.sqlite";
-private readonly BatchOpsFactory _factory = new(); //!!! Register as singleton in web app
-private readonly BatchOps _batchOps;
+namespace MarlinBatchOpsExample;
 
-// Even though it makes no sense to use BatchOps in single client mode
-// this code shows basic functions of the library
-
-public Program()
+public class Program
 {
-    _factory.SetSettingsForBatchOps(ConnectionString, new BatchOpsSettings
+    private const string ConnectionString = "Data Source=my-db.sqlite";
+    private readonly BatchOpsFactory _factory = new(); //!!! Register as singleton in web app
+    private readonly BatchOps _batchOps;
+
+    // Even though it makes no sense to use BatchOps in single client mode
+    // this code shows basic functions of the library
+
+    public Program()
     {
-        UseWriteAheadLogging = true
-    });
+        _factory.SetSettingsForBatchOps(ConnectionString, new BatchOpsSettings
+        {
+            UseWriteAheadLogging = true
+        });
 
-    _batchOps = _factory.GetBatchOps(ConnectionString);
-}
+        _batchOps = _factory.GetBatchOps(ConnectionString);
+    }
 
-public static async Task Main()
-{
-    Program p = new();
-    await p.RunAsync();
-}
-
-private async Task RunAsync()
-{
-    CreateTable();
-
-    await _batchOps.ExecuteAsync("INSERT INTO T1(Val1, Val2) VALUES (@val1, @val2)", new
+    public static async Task Main()
     {
-        val1 = 1,
-        val2 = "1"
-    });
+        Program p = new();
+        await p.RunAsync();
+    }
 
-    await _batchOps.ExecuteAsync("INSERT INTO T1(Val1, Val2) VALUES (@val1, @val2)", new
+    private async Task RunAsync()
     {
-        val1 = 2,
-        val2 = "2"
-    });
+        CreateTable();
 
-    await using SqliteConnection c = new(ConnectionString);
+        await _batchOps.ExecuteAsync("INSERT INTO T1(Val1, Val2) VALUES (@val1, @val2)", new
+        {
+            val1 = 1,
+            val2 = "1"
+        });
 
-    int count = c.QuerySingle<int>("SELECT COUNT(1) FROM T1");
+        await _batchOps.ExecuteAsync("INSERT INTO T1(Val1, Val2) VALUES (@val1, @val2)", new
+        {
+            val1 = 2,
+            val2 = "2"
+        });
 
-    Console.WriteLine($"T1 row count: {count}");
+        await using SqliteConnection c = new(ConnectionString);
+
+        int count = c.QuerySingle<int>("SELECT COUNT(1) FROM T1");
+
+        Console.WriteLine($"T1 row count: {count}");
+    }
+
+    private void CreateTable()
+    {
+        const string sqlCreateTable =
+            """
+            CREATE TABLE IF NOT EXISTS T1 (Val1 INTEGER, Val2 TEXT)
+            """;
+
+        using SqliteConnection c = new(ConnectionString);
+        c.Execute("PRAGMA journal_mode = WAL");
+        c.Execute(sqlCreateTable);
+
+        Console.WriteLine("Table created (if it didn't exist already)");
+    }
 }
 ```
 
