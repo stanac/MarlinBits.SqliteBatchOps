@@ -2,8 +2,8 @@
 
 public class BatchOpsFactory : IDisposable
 {
-    private readonly Dictionary<string, BatchOps> _batchOps = new();
-    private readonly Dictionary<string, BatchOpsSettings> _settings = new();
+    private static readonly Dictionary<string, BatchOps> _batchOps = new();
+    private static readonly Dictionary<string, BatchOpsSettings> _settings = new();
     private static readonly Lock _lock = new();
 
     /// <summary>
@@ -41,5 +41,8 @@ public class BatchOpsFactory : IDisposable
         {
             batchOps.Dispose();
         }
+
+        _batchOps.Clear();
+        _settings.Clear();
     }
 }

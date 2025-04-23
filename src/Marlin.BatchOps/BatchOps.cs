@@ -9,11 +9,11 @@ public class BatchOps : IDisposable
     private const string WalPragma = "PRAGMA journal_mode = WAL";
     private readonly CommandQueue _queue;
 
-    public BatchOps(string connectionString) : this(connectionString, new())
+    internal BatchOps(string connectionString) : this(connectionString, new())
     {
     }
 
-    public BatchOps(string connectionString, BatchOpsSettings settings)
+    internal BatchOps(string connectionString, BatchOpsSettings settings)
     {
         _connection = new SqliteConnection(connectionString);
         _connection.Open();

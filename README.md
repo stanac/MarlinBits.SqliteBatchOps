@@ -34,12 +34,56 @@ Reference nuget package:
 dotnet add package SqliteBatchOps
 ```
 
-```
-// other usings
-using SqliteBatchOps;
+```csharp
+using Dapper;
+using Marlin.BatchOps;
+using Microsoft.Data.Sqlite;
 
-// TODO
+private const string ConnectionString = "Data Source=my-db.sqlite";
+private readonly BatchOpsFactory _factory = new(); //!!! Register as singleton in web app
+private readonly BatchOps _batchOps;
 
+// Even though it makes no sense to use BatchOps in single client mode
+// this code shows basic functions of the library
+
+public Program()
+{
+    _factory.SetSettingsForBatchOps(ConnectionString, new BatchOpsSettings
+    {
+        UseWriteAheadLogging = true
+    });
+
+    _batchOps = _factory.GetBatchOps(ConnectionString);
+}
+
+public static async Task Main()
+{
+    Program p = new();
+    await p.RunAsync();
+}
+
+private async Task RunAsync()
+{
+    CreateTable();
+
+    await _batchOps.ExecuteAsync("INSERT INTO T1(Val1, Val2) VALUES (@val1, @val2)", new
+    {
+        val1 = 1,
+        val2 = "1"
+    });
+
+    await _batchOps.ExecuteAsync("INSERT INTO T1(Val1, Val2) VALUES (@val1, @val2)", new
+    {
+        val1 = 2,
+        val2 = "2"
+    });
+
+    await using SqliteConnection c = new(ConnectionString);
+
+    int count = c.QuerySingle<int>("SELECT COUNT(1) FROM T1");
+
+    Console.WriteLine($"T1 row count: {count}");
+}
 ```
 
 ## Downsides
