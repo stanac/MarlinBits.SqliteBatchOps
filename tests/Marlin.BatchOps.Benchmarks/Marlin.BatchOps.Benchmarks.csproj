@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SqliteBatchOps\SqliteBatchOps.csproj" />
+    <ProjectReference Include="..\..\src\Marlin.BatchOps\Marlin.BatchOps.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace SqliteBatchOps.Benchmarks;
+namespace Marlin.BatchOps.Benchmarks;
 
 [SimpleJob]
 public class InsertBenchmark

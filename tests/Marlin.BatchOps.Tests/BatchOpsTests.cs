@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 
-namespace SqliteBatchOps.Tests;
+namespace Marlin.BatchOps.Tests;
 
 public class BatchOpsTests : IDisposable
 {

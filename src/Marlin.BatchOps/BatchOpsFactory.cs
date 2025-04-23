@@ -1,4 +1,4 @@
-﻿namespace SqliteBatchOps;
+﻿namespace Marlin.BatchOps;
 
 public class BatchOpsFactory : IDisposable
 {
