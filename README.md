@@ -1,4 +1,4 @@
-# SqliteBatchOps
+# Marlin.BatchOps
 
 Fast batch insert/update/delete for `Microsoft.Data.Sqlite`.
 
@@ -6,7 +6,7 @@ This library can execute 30x more commands (inserts/deletes/updates) per second 
 
 ## What?
 
-`SqliteBatchOps` is has batch command executor that is using [Dapper](https://github.com/DapperLib/Dapper) to execute SQL statements in single transaction for faster execution.
+`Marlin.BatchOps` is has batch command executor that is using [Dapper](https://github.com/DapperLib/Dapper) to execute SQL statements in single transaction for faster execution.
 
 ## Why?
 
@@ -31,7 +31,7 @@ Use `BatchOpsFactory` to ensure single instance of `BatchOps` per database/conne
 Reference nuget package:
 
 ```
-dotnet add package SqliteBatchOps
+dotnet add package Marlin.BatchOps
 ```
 
 ```csharp
