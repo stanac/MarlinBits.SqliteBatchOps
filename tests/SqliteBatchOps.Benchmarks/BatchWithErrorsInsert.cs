@@ -4,7 +4,7 @@ using Microsoft.Data.Sqlite;
 
 namespace SqliteBatchOps.Benchmarks;
 
-public class BatchOnlyInsert
+public class BatchWithErrorsInsert
 {
     private const string NvmeDiskDbFileDir = @"e:\dbtests\";
     private string? _dbFilePath;
@@ -13,11 +13,15 @@ public class BatchOnlyInsert
 
     private const string CreateTableSql = "CREATE TABLE T1 (Val1 INTEGER NOT NULL)";
     private const string InsertSql = "INSERT INTO T1 (Val1) VALUES (@value)";
+    private const string InsertSqlError = "INSERT INTO T2 (Val1) VALUES (@value)";
+
+    private readonly HashSet<int> _errorIndices = [];
 
     private object GetParam(int value) => new { value };
 
     private string GetNewConnectionString()
     {
+        // string dir = DiskType == "RAM" ? RamDiskDbFileDir : NvmeDiskDbFileDir;
         string dir = NvmeDiskDbFileDir;
 
         string fileName = string.Format("testdb-{0}.sqlite", Guid.NewGuid().ToString("N"));
@@ -28,26 +32,42 @@ public class BatchOnlyInsert
         return connectionString;
     }
 
-    [Params(1, 5/*, 10, 25, 50, 100, 250, 500, 1_000, 10_000, 25_000, 50_000, 100_000*/)] 
+    [Params(50, 100, 1_000, 10_000)] 
     public int NumberOfConcurrentInserts;
-    
+
+    [Params(0, 1, 2)]
+    public int PercentOfErrorStatements;
+
+    private bool IsError(int index)
+    {
+        return _errorIndices.Contains(index);
+    }
+
+    private string GetSql(int index) => IsError(index) ? InsertSqlError : InsertSql;
+
     [IterationSetup]
     public void Setup()
     {
         string connectionString = GetNewConnectionString();
         _connection = new SqliteConnection(connectionString);
         _connection.Open();
-
         _connection.Execute("PRAGMA journal_mode = WAL");
 
         _connection.Execute(CreateTableSql);
 
         _batchOps = new(connectionString, new BatchOpsSettings
         {
-            UseWriteAheadLogging = true,
-            MillisecondsWait = 50
-            //MillisecondsWait = 10
+            UseWriteAheadLogging = true
         });
+
+        Random rng = new();
+        _errorIndices.Clear();
+        int errorCount = (int)(NumberOfConcurrentInserts * PercentOfErrorStatements / 100.0);
+
+        while (_errorIndices.Count < errorCount)
+        {
+            _errorIndices.Add(rng.Next(NumberOfConcurrentInserts));
+        }
     }
 
     [IterationCleanup]
@@ -70,13 +90,20 @@ public class BatchOnlyInsert
             }
         }
     }
-    
+
     [Benchmark]
     public async Task InsertWithBatch()
     {
         IEnumerable<Task<long?>> tasks = Enumerable.Range(0, NumberOfConcurrentInserts)
-            .Select(value => _batchOps!.ExecuteAsync(InsertSql, GetParam(value)));
+            .Select(value => _batchOps!.ExecuteAsync(GetSql(value), GetParam(value)));
 
-        await Task.WhenAll(tasks);
+        try
+        {
+            await Task.WhenAll(tasks);
+        }
+        catch
+        {
+            // nop
+        }
     }
 }

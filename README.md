@@ -6,7 +6,7 @@ This library can execute 30x more commands (inserts/deletes/updates) per second 
 
 ## What?
 
-`SqliteBatchOps` is adding batch command executor () and is using [Dapper](https://github.com/DapperLib/Dapper) to execute SQL statements in single transaction for faster execution.
+`SqliteBatchOps` is has batch command executor that is using [Dapper](https://github.com/DapperLib/Dapper) to execute SQL statements in single transaction for faster execution.
 
 ## Why?
 
@@ -42,7 +42,7 @@ using SqliteBatchOps;
 
 ```
 
-## Pitfalls
+## Downsides
 
 This library has an overhead of ~50 ms by default, it can be lowered to ~25 ms. 
 It isn't suitable for single client applications (mobile, desktop).
@@ -52,6 +52,9 @@ It is highly recommended to use it in WAL mode (see `BatchOpsSettings`).
 
 Only `async` operations are supported.
 `Task`s are used as callback functions and there is no way to achieve the same with sync operation.
+
+SQL statements with errors will slow down other statements (see last four benchmark tables).
+This shouldn't be a real life problem if application is tested properly.
 
 ## Benchmarks using NVMe drive and WAL mode
 
@@ -135,6 +138,42 @@ Below are results of batch inserts only, because running more than 1000 discrete
 | InsertWithBatch | 100000                    | 328.61 ms | 4.892 ms | 4.085 ms |
 
 Somewhat better results are achieved with lowering wait time, but not significantly.
+
+Percentage of error statements and how it affect performance:
+
+| Method          | NumberOfConcurrentInserts | PercentOfErrorStatements | Mean        | Error     | StdDev    |
+|---------------- |-------------------------- |------------------------- |------------:|----------:|----------:|
+| InsertWithBatch | 50                        | 0                        |    57.84 ms |  1.135 ms |  1.957 ms |
+| InsertWithBatch | 50                        | 1                        |    57.79 ms |  1.152 ms |  2.192 ms |
+| InsertWithBatch | 50                        | 2                        |    55.83 ms |  1.116 ms |  1.096 ms |
+
+| Method          | NumberOfConcurrentInserts | PercentOfErrorStatements | Mean        | Error     | StdDev    |
+|---------------- |-------------------------- |------------------------- |------------:|----------:|----------:|
+| InsertWithBatch | 100                       | 0                        |    56.30 ms |  0.701 ms |  0.656 ms |
+| InsertWithBatch | 100                       | 1                        |    55.75 ms |  1.071 ms |  1.099 ms |
+| InsertWithBatch | 100                       | 2                        |    55.43 ms |  1.050 ms |  1.124 ms |
+
+| Method          | NumberOfConcurrentInserts | PercentOfErrorStatements | Mean        | Error     | StdDev    |
+|---------------- |-------------------------- |------------------------- |------------:|----------:|----------:|
+| InsertWithBatch | 1000                      | 0                        |    55.45 ms |  0.794 ms |  0.883 ms |
+| InsertWithBatch | 1000                      | 1                        |    69.55 ms |  1.377 ms |  2.718 ms |
+| InsertWithBatch | 1000                      | 2                        |    82.90 ms |  1.648 ms |  4.371 ms |
+
+| Method          | NumberOfConcurrentInserts | PercentOfErrorStatements | Mean        | Error     | StdDev    |
+|---------------- |-------------------------- |------------------------- |------------:|----------:|----------:|
+| InsertWithBatch | 10000                     | 0                        |    66.68 ms |  1.244 ms |  2.009 ms |
+| InsertWithBatch | 10000                     | 1                        |   619.73 ms | 12.359 ms | 32.124 ms |
+| InsertWithBatch | 10000                     | 2                        | 1,165.97 ms | 22.958 ms | 47.922 ms |
+
+All benchmarks are executed using BenchmarkDotNet
+
+```
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26100.3775)
+AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
+.NET SDK 9.0.201
+  [Host]     : .NET 9.0.3 (9.0.325.11113), X64 RyuJIT AVX2
+  Job-VOMVFZ : .NET 9.0.3 (9.0.325.11113), X64 RyuJIT AVX2
+```
 
 ## When not to use the library
 
