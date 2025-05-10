@@ -25,7 +25,7 @@ For each SQLite db your application use, you can create an instance of `BatchOps
 It will use a thread-synced queue in the background and trigger writes every 50,000 operations (configurable) or every 50 ms (configurable), whichever comes first.
 
 Use `BatchOpsFactory` to ensure single instance of `BatchOps` per database/connection string.
-When using with IoC container register `BatchOpsFactory` as singleton.
+When using with IoC container register `BatchOpsFactory` as a singleton.
 
 ## How to use it?
 

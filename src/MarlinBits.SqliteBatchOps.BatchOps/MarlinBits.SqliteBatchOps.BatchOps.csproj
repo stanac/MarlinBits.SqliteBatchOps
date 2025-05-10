@@ -9,7 +9,7 @@
 		<Authors>stanac</Authors>
 		<PackageTags>Sqlite</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/stanac/marlin</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/stanac/MarlinBits.SqliteBatchOps</PackageProjectUrl>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
