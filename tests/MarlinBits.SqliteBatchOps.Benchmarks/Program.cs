@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Running;
 
-namespace MarlinBits.SqliteBatchOps.BatchOps.Benchmarks;
+namespace MarlinBits.SqliteBatchOps.Benchmarks;
 
 internal class Program
 {

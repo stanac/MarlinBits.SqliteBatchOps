@@ -1,5 +1,5 @@
 using Dapper;
-using MarlinBits.SqliteBatchOps.BatchOps;
+using MarlinBits.SqliteBatchOps;
 using Microsoft.Data.Sqlite;
 
 namespace MarlinBits.SqliteBatchOpsBatchOpsExample;

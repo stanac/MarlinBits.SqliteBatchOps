@@ -12,11 +12,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "!SolutionItems", "!Solution
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BD7B4F3C-F7DE-4F5B-81B8-FF29C8C78BB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarlinBits.SqliteBatchOps.BatchOps", "src\MarlinBits.SqliteBatchOps.BatchOps\MarlinBits.SqliteBatchOps.BatchOps.csproj", "{D7A7F8FB-B852-F0B3-DB4B-F340895E4611}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarlinBits.SqliteBatchOps", "src\MarlinBits.SqliteBatchOps\MarlinBits.SqliteBatchOps.csproj", "{D7A7F8FB-B852-F0B3-DB4B-F340895E4611}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarlinBits.SqliteBatchOps.BatchOps.Tests", "tests\MarlinBits.SqliteBatchOps.BatchOps.Tests\MarlinBits.SqliteBatchOps.BatchOps.Tests.csproj", "{231175A5-4B32-554E-4425-4CE889C08948}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarlinBits.SqliteBatchOps.Tests", "tests\MarlinBits.SqliteBatchOps.Tests\MarlinBits.SqliteBatchOps.Tests.csproj", "{231175A5-4B32-554E-4425-4CE889C08948}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarlinBits.SqliteBatchOps.BatchOps.Benchmarks", "tests\MarlinBits.SqliteBatchOps.BatchOps.Benchmarks\MarlinBits.SqliteBatchOps.BatchOps.Benchmarks.csproj", "{D8F07C90-3267-25EB-5AFD-6F683D3A924C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarlinBits.SqliteBatchOps.Benchmarks", "tests\MarlinBits.SqliteBatchOps.Benchmarks\MarlinBits.SqliteBatchOps.Benchmarks.csproj", "{D8F07C90-3267-25EB-5AFD-6F683D3A924C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{D979AEAD-885D-48D6-8897-476E5D5DA05D}"
 EndProject

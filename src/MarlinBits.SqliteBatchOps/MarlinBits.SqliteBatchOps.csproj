@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
@@ -17,8 +17,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="MarlinBits.SqliteBatchOps.BatchOps.Tests"></InternalsVisibleTo>
-		<InternalsVisibleTo Include="MarlinBits.SqliteBatchOps.BatchOps.Benchmarks"></InternalsVisibleTo>
+		<InternalsVisibleTo Include="MarlinBits.SqliteBatchOps.Tests"></InternalsVisibleTo>
+		<InternalsVisibleTo Include="MarlinBits.SqliteBatchOps.Benchmarks"></InternalsVisibleTo>
 	</ItemGroup>
 
 	<ItemGroup>

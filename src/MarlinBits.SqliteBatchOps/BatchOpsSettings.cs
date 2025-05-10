@@ -1,4 +1,4 @@
-namespace MarlinBits.SqliteBatchOps.BatchOps;
+namespace MarlinBits.SqliteBatchOps;
 
 /// <summary>
 /// Settings for <see cref="BatchOps"/>

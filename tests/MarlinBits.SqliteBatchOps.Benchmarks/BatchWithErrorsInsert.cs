@@ -2,7 +2,7 @@ using BenchmarkDotNet.Attributes;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace MarlinBits.SqliteBatchOps.BatchOps.Benchmarks;
+namespace MarlinBits.SqliteBatchOps.Benchmarks;
 
 public class BatchWithErrorsInsert
 {

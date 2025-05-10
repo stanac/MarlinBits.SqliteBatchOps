@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace MarlinBits.SqliteBatchOps.BatchOps;
+namespace MarlinBits.SqliteBatchOps;
 
 internal class CommandQueue : IDisposable
 {
