@@ -1,7 +1,7 @@
-﻿using Dapper;
+using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace Marlin.BatchOps;
+namespace MarlinBits.SqliteBatchOps.BatchOps;
 
 public class BatchOps : IDisposable
 {

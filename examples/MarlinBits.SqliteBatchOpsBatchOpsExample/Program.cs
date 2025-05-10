@@ -1,8 +1,8 @@
-﻿using Dapper;
-using Marlin.BatchOps;
+using Dapper;
+using MarlinBits.SqliteBatchOps.BatchOps;
 using Microsoft.Data.Sqlite;
 
-namespace MarlinBatchOpsExample;
+namespace MarlinBits.SqliteBatchOpsBatchOpsExample;
 
 public class Program
 {

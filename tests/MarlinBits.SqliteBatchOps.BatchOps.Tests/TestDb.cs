@@ -1,7 +1,7 @@
-﻿using Dapper;
+using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace Marlin.BatchOps.Tests;
+namespace MarlinBits.SqliteBatchOps.BatchOps.Tests;
 
 public class TestDb : IDisposable
 {

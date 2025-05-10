@@ -1,8 +1,8 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace Marlin.BatchOps.Benchmarks;
+namespace MarlinBits.SqliteBatchOps.BatchOps.Benchmarks;
 
 public class BatchWithErrorsInsert
 {

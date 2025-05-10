@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Marlin.BatchOps\Marlin.BatchOps.csproj" />
+    <ProjectReference Include="..\..\src\MarlinBits.SqliteBatchOps.BatchOps\MarlinBits.SqliteBatchOps.BatchOps.csproj" />
   </ItemGroup>
 
   <ItemGroup>

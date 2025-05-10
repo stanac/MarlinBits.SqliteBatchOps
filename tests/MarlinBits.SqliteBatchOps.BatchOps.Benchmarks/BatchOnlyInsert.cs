@@ -1,13 +1,11 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace Marlin.BatchOps.Benchmarks;
+namespace MarlinBits.SqliteBatchOps.BatchOps.Benchmarks;
 
-[SimpleJob]
-public class InsertBenchmark
+public class BatchOnlyInsert
 {
-    private const string RamDiskDbFileDir = @"r:\dbtests\";
     private const string NvmeDiskDbFileDir = @"e:\dbtests\";
     private string? _dbFilePath;
     private SqliteConnection? _connection;
@@ -20,8 +18,7 @@ public class InsertBenchmark
 
     private string GetNewConnectionString()
     {
-        // string dir = DiskType == "RAM" ? RamDiskDbFileDir : NvmeDiskDbFileDir;
-        string dir =NvmeDiskDbFileDir;
+        string dir = NvmeDiskDbFileDir;
 
         string fileName = string.Format("testdb-{0}.sqlite", Guid.NewGuid().ToString("N"));
         _dbFilePath = Path.Combine(dir, fileName);
@@ -31,28 +28,25 @@ public class InsertBenchmark
         return connectionString;
     }
 
-    [Params(1, 5 /*, 10, 25, 50, 100, 250, 500, 1_000*/)] public int NumberOfConcurrentInserts;
-    // [Params(true, false)] public bool UseWriteAheadLogging;
-    // [Params("RAM", "NVMe")] public string DiskType = "";
-
+    [Params(1, 5/*, 10, 25, 50, 100, 250, 500, 1_000, 10_000, 25_000, 50_000, 100_000*/)] 
+    public int NumberOfConcurrentInserts;
+    
     [IterationSetup]
     public void Setup()
     {
         string connectionString = GetNewConnectionString();
         _connection = new SqliteConnection(connectionString);
         _connection.Open();
-        
-        if (/*UseWriteAheadLogging*/ true)
-        {
-            _connection.Execute("PRAGMA journal_mode = WAL");
-        }
+
+        _connection.Execute("PRAGMA journal_mode = WAL");
 
         _connection.Execute(CreateTableSql);
 
         _batchOps = new(connectionString, new BatchOpsSettings
         {
-            // UseWriteAheadLogging = UseWriteAheadLogging
-            UseWriteAheadLogging = true
+            UseWriteAheadLogging = true,
+            MillisecondsWait = 50
+            //MillisecondsWait = 10
         });
     }
 
@@ -76,16 +70,7 @@ public class InsertBenchmark
             }
         }
     }
-
-    [Benchmark]
-    public async Task InsertsWithoutBatch()
-    {
-        IEnumerable<Task<int>> tasks = Enumerable.Range(0, NumberOfConcurrentInserts)
-            .Select(value => _connection!.ExecuteAsync(InsertSql, GetParam(value)));
-
-        await Task.WhenAll(tasks);
-    }
-
+    
     [Benchmark]
     public async Task InsertWithBatch()
     {

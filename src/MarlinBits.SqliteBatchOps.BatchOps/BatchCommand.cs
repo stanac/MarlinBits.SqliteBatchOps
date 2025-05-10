@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Marlin.BatchOps;
+namespace MarlinBits.SqliteBatchOps.BatchOps;
 
 /// <summary>
 /// Batch command, used when multiple commands needs to be executed in transaction
